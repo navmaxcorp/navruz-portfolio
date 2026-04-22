@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Navruz Rustamov — Veb Sayt & Telegram Bot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --card: #1a1a26;
+      --accent: #6c63ff;
+      --accent2: #ff6584;
+      --accent3: #43e97b;
+      --text: #f0f0f8;
+      --muted: #8888aa;
+      --border: rgba(108,99,255,0.18);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content:'';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: .5;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 6vw;
+      backdrop-filter: blur(20px);
+      background: rgba(10,10,15,0.7);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.3rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; gap: 2rem; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: .9rem;
+      transition: color .3s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 0 6vw;
+      position: relative;
+    }
+    .hero-glow {
+      position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(108,99,255,0.18) 0%, transparent 70%);
+      top: 50%; right: -100px;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(108,99,255,0.15);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: .8rem; letter-spacing: .1em; text-transform: uppercase;
+      padding: .4rem 1rem; border-radius: 100px;
+      margin-bottom: 1.5rem;
+      animation: fadeUp .6s ease both;
+    }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 800; line-height: 1.05;
+      animation: fadeUp .7s ease .1s both;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      max-width: 520px;
+      color: var(--muted); font-size: 1.1rem; line-height: 1.7;
+      margin: 1.5rem 0 2.5rem;
+      animation: fadeUp .7s ease .2s both;
+    }
+    .hero-btns {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      animation: fadeUp .7s ease .3s both;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #9b59b6);
+      color: #fff; border: none; cursor: pointer;
+      padding: .9rem 2rem; border-radius: 12px;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 4px 24px rgba(108,99,255,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(108,99,255,0.45); }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text); cursor: pointer;
+      padding: .9rem 2rem; border-radius: 12px;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem;
+      text-decoration: none;
+      transition: border-color .2s, background .2s;
+    }
+    .btn-outline:hover { border-color: var(--accent); background: rgba(108,99,255,0.08); }
+
+    .hero-stats {
+      display: flex; gap: 3rem; margin-top: 4rem;
+      animation: fadeUp .7s ease .4s both;
+    }
+    .stat-num {
+      font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent3), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .stat-label { color: var(--muted); font-size: .85rem; margin-top: .2rem; }
+
+    /* ── SECTIONS ── */
+    section { padding: 6rem 6vw; position: relative; }
+    .section-tag {
+      font-size: .8rem; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800; margin-bottom: 1rem;
+    }
+    .section-sub { color: var(--muted); max-width: 500px; line-height: 1.7; }
+
+    /* ── SERVICES ── */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .service-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      transition: transform .3s, border-color .3s, box-shadow .3s;
+      position: relative; overflow: hidden;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(108,99,255,0.05), transparent);
+      opacity: 0; transition: opacity .3s;
+    }
+    .service-card:hover { transform: translateY(-6px); border-color: var(--accent); box-shadow: 0 12px 40px rgba(108,99,255,0.15); }
+    .service-card:hover::before { opacity: 1; }
+    .service-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; margin-bottom: 1.5rem;
+    }
+    .icon-purple { background: rgba(108,99,255,0.15); }
+    .icon-pink   { background: rgba(255,101,132,0.15); }
+    .icon-green  { background: rgba(67,233,123,0.15); }
+    .icon-blue   { background: rgba(99,179,255,0.15); }
+    .service-card h3 {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: 1.15rem; margin-bottom: .6rem;
+    }
+    .service-card p { color: var(--muted); font-size: .9rem; line-height: 1.6; }
+    .service-price {
+      margin-top: 1.2rem;
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      color: var(--accent3); font-size: 1rem;
+    }
+
+    /* ── PORTFOLIO ── */
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .portfolio-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px; overflow: hidden;
+      transition: transform .3s, box-shadow .3s;
+    }
+    .portfolio-card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(0,0,0,0.4); }
+    .portfolio-img {
+      height: 180px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem;
+      position: relative; overflow: hidden;
+    }
+    .portfolio-img.cafe   { background: linear-gradient(135deg, #1a0a00, #3d1a00); }
+    .portfolio-img.doctor { background: linear-gradient(135deg, #001a2c, #003d5c); }
+    .portfolio-img.shop   { background: linear-gradient(135deg, #0a1a0a, #1a3d1a); }
+    .portfolio-badge {
+      position: absolute; top: 1rem; right: 1rem;
+      background: rgba(108,99,255,0.2);
+      border: 1px solid var(--border);
+      color: var(--accent); font-size: .7rem;
+      padding: .3rem .7rem; border-radius: 100px;
+    }
+    .portfolio-info { padding: 1.5rem; }
+    .portfolio-info h3 {
+      font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: .4rem;
+    }
+    .portfolio-info p { color: var(--muted); font-size: .85rem; }
+
+    /* ── PRICING ── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .pricing-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 2rem;
+      transition: transform .3s;
+    }
+    .pricing-card.featured {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(108,99,255,0.12), var(--card));
+      position: relative;
+    }
+    .pricing-card.featured::before {
+      content: '⭐ Mashhur';
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      background: var(--accent); color: #fff;
+      font-size: .75rem; padding: .3rem 1rem; border-radius: 100px;
+      white-space: nowrap;
+    }
+    .pricing-card:hover { transform: translateY(-4px); }
+    .pricing-card h3 {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: 1.1rem; margin-bottom: 1rem;
+    }
+    .pricing-amount {
+      font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .pricing-amount span { font-size: 1rem; color: var(--muted); -webkit-text-fill-color: var(--muted); }
+    .pricing-features { margin-top: 1.5rem; list-style: none; }
+    .pricing-features li {
+      color: var(--muted); font-size: .9rem;
+      padding: .5rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .pricing-features li::before { content: '✓'; color: var(--accent3); font-weight: 700; }
+
+    /* ── CONTACT ── */
+    .contact-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem; align-items: center;
+      margin-top: 3rem;
+    }
+    .contact-info p { color: var(--muted); line-height: 1.8; margin-bottom: 2rem; }
+    .contact-links { display: flex; flex-direction: column; gap: 1rem; }
+    .contact-link {
+      display: flex; align-items: center; gap: 1rem;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1rem 1.5rem;
+      text-decoration: none; color: var(--text);
+      transition: border-color .2s, transform .2s;
+    }
+    .contact-link:hover { border-color: var(--accent); transform: translateX(6px); }
+    .contact-link-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .contact-link-text strong { display: block; font-size: .95rem; }
+    .contact-link-text span { color: var(--muted); font-size: .8rem; }
+    .contact-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 2.5rem;
+    }
+    .contact-card h3 {
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: 1.4rem; margin-bottom: 1.5rem;
+    }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; color: var(--muted); font-size: .85rem; margin-bottom: .5rem; }
+    .form-group input,
+    .form-group textarea {
+      width: 100%; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: .85rem 1rem; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: .95rem;
+      outline: none; resize: none;
+      transition: border-color .2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea { height: 100px; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding: 2.5rem 6vw;
+      border-top: 1px solid var(--border);
+      color: var(--muted); font-size: .85rem;
+    }
+    footer strong { color: var(--accent); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      width: 60px; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 100px; margin: 1rem 0 0;
+    }
+
+    @media (max-width: 768px) {
+      .contact-wrapper { grid-template-columns: 1fr; gap: 2rem; }
+      .hero-stats { gap: 1.5rem; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">NR.</div>
+  <div class="nav-links">
+    <a href="#services">Xizmatlar</a>
+    <a href="#portfolio">Portfolio</a>
+    <a href="#pricing">Narxlar</a>
+    <a href="#contact">Aloqa</a>
+  </div>
+  <a class="btn-primary" href="https://t.me/navruz_yusupovich" target="_blank" style="padding:.6rem 1.4rem;font-size:.9rem;">Buyurtma</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-tag">🚀 Veb Sayt & Telegram Bot Mutaxassisi</div>
+  <h1>Biznesingizni<br><span>Raqamli Dunyoga</span><br>Olib Chiqaman</h1>
+  <p class="hero-sub">Salom! Men Navruz Rustamov — web-saytlar va Telegram botlar yarataman. Sizning biznesingizni onlayn rivojlanishida hamda yuqori cho'qqilarga olib chiqishda yordam beraman. Tez, sifatli, arzon.</p>
+  <div class="hero-btns">
+    <a class="btn-primary" href="https://t.me/navruz_yusupovich" target="_blank">💬 Telegram orqali bog'lanish</a>
+    <a class="btn-outline" href="#portfolio">Ishlarimni ko'rish</a>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="stat-num">50+</div>
+      <div class="stat-label">Bajarilgan loyiha</div>
+    </div>
+    <div>
+      <div class="stat-num">3 kun</div>
+      <div class="stat-label">O'rtacha yetkazish</div>
+    </div>
+    <div>
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Kafolat</div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-tag">Nima qilaman</div>
+  <h2 class="section-title">Xizmatlarim</h2>
+  <p class="section-sub">Biznesingiz uchun eng kerakli raqamli yechimllar</p>
+  <div class="divider"></div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon icon-purple">🌐</div>
+      <h3>Vizitka Sayt</h3>
+      <p>Biznesingiz haqida ma'lumot, kontaktlar va xizmatlar ko'rsatilgan oddiy, chiroyli sayt.</p>
+      <div class="service-price">300,000 so'mdan</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon icon-pink">🛒</div>
+      <h3>Ko'p Sahifali Sayt</h3>
+      <p>Mahsulot katalogi, blog, forma va boshqa bo'limlar bilan to'liq funksional sayt.</p>
+      <div class="service-price">800,000 so'mdan</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon icon-green">🤖</div>
+      <h3>Telegram Bot</h3>
+      <p>Menyu, katalog, navbat olish, ma'lumot berish — biznesingiz uchun avtomatik bot.</p>
+      <div class="service-price">500,000 so'mdan</div>
+    </div>
+    <div class="service-card">
+      <div class="service-icon icon-blue">🔧</div>
+      <h3>Texnik Xizmat</h3>
+      <p>Sayt yoki botingizni oylik kuzatish, yangilash va qo'llab-quvvatlash xizmati.</p>
+      <div class="service-price">150,000 so'm/oy</div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section id="portfolio" style="background: var(--surface);">
+  <div class="section-tag">Ishlarim</div>
+  <h2 class="section-title">Portfolio</h2>
+  <p class="section-sub">Mijozlar uchun yaratilgan loyihalardan namunalar</p>
+  <div class="divider"></div>
+  <div class="portfolio-grid">
+    <div class="portfolio-card">
+      <a href="https://sites.google.com/view/marrymenavoiy" target="_blank" style="text-decoration:none;color:inherit;">
+        <div class="portfolio-img" style="background: linear-gradient(135deg, #1a0010, #4a0030); position:relative;">
+          💍
+          <div class="portfolio-badge">Google Sites</div>
+        </div>
+        <div class="portfolio-info">
+          <h3>Marry Me Navoiy 💍</h3>
+          <p>Navoiy shahridagi romantik taklif marosimlari xizmati. Tariflar: Standart, Komfort, Premium. Fotozona, musiqa, shirinliklar va professional operator.</p>
+          <div style="margin-top:.8rem; color: var(--accent); font-size:.82rem; font-weight:600;">🔗 Saytni ko'rish →</div>
+        </div>
+      </a>
+    </div>
+    <div class="portfolio-card">
+      <a href="https://sites.google.com/view/windenergyuz" target="_blank" style="text-decoration:none;color:inherit;">
+        <div class="portfolio-img" style="background: linear-gradient(135deg, #001a0a, #003d20); position:relative;">
+          🌬️
+          <div class="portfolio-badge">Google Sites · 3 til</div>
+        </div>
+        <div class="portfolio-info">
+          <h3>Green Wind Solutions UZ 🌱</h3>
+          <p>O'zbekistonda shamol energiyasi yechimlari kompaniyasi. Ko'p tilli sayt: O'zbek, Rus, Ingliz tillarida. Xizmatlar, katalog, hamkorlar bo'limlari bilan.</p>
+          <div style="margin-top:.8rem; color: var(--accent); font-size:.82rem; font-weight:600;">🔗 Saytni ko'rish →</div>
+        </div>
+      </a>
+    </div>
+    <div class="portfolio-card">
+      <div class="portfolio-img" style="background: linear-gradient(135deg, #0a0a1a, #1a1a4a); position:relative;">
+        🤖
+        <div class="portfolio-badge" style="background:rgba(67,233,123,0.2);color:#43e97b;border-color:rgba(67,233,123,0.3);">Navbat bor</div>
+      </div>
+      <div class="portfolio-info">
+        <h3>Sizning loyihangiz 🚀</h3>
+        <p>Biznesingiz uchun veb-sayt yoki Telegram bot yaratishni xohlaysizmi? Hoziroq bog'laning — bepul maslahat beramiz!</p>
+        <a href="https://t.me/navruz_yusupovich" target="_blank" style="display:inline-block;margin-top:.8rem; color: var(--accent3); font-size:.82rem; font-weight:600; text-decoration:none;">💬 Buyurtma berish →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-tag">Narxlar</div>
+  <h2 class="section-title">Aniq Narxlar</h2>
+  <p class="section-sub">Yashirin to'lovlar yo'q — narx oldindan aniq belgilanadi</p>
+  <div class="divider"></div>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <h3>🌱 Boshlang'ich</h3>
+      <div class="pricing-amount">300,000 <span>so'm</span></div>
+      <ul class="pricing-features">
+        <li>1 sahifali sayt</li>
+        <li>Mobil moslik</li>
+        <li>Kontakt ma'lumotlar</li>
+        <li>3 kun ichida tayyor</li>
+        <li>1 oy bepul qo'llab-quvvatlash</li>
+      </ul>
+    </div>
+    <div class="pricing-card featured">
+      <h3>🚀 Standart</h3>
+      <div class="pricing-amount">800,000 <span>so'm</span></div>
+      <ul class="pricing-features">
+        <li>5 sahifagacha sayt</li>
+        <li>Mahsulot katalogi</li>
+        <li>Bog'lanish formasi</li>
+        <li>5 kun ichida tayyor</li>
+        <li>3 oy bepul qo'llab-quvvatlash</li>
+      </ul>
+    </div>
+    <div class="pricing-card">
+      <h3>🤖 Telegram Bot</h3>
+      <div class="pricing-amount">600,000 <span>so'm</span></div>
+      <ul class="pricing-features">
+        <li>Menyu & katalog</li>
+        <li>Buyurtma qabul qilish</li>
+        <li>Admin panel</li>
+        <li>4 kun ichida tayyor</li>
+        <li>2 oy bepul qo'llab-quvvatlash</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" style="background: var(--surface);">
+  <div class="section-tag">Bog'lanish</div>
+  <h2 class="section-title">Aloqaga Chiqing</h2>
+  <p class="section-sub">Loyiha bo'yicha maslahat bepul — hoziroq yozing!</p>
+  <div class="divider"></div>
+  <div class="contact-wrapper">
+    <div class="contact-info">
+      <p>Har qanday savol yoki buyurtma uchun quyidagi kanallar orqali bog'laning. Odatda 1 soat ichida javob beraman.</p>
+      <div class="contact-links">
+        <a class="contact-link" href="https://t.me/navruz_yusupovich" target="_blank">
+          <div class="contact-link-icon" style="background:rgba(37,211,102,0.15);">💬</div>
+          <div class="contact-link-text">
+            <strong>Telegram</strong>
+            <span>@navruz_yusupovich</span>
+          </div>
+        </a>
+        <a class="contact-link" href="tel:+998973677774">
+          <div class="contact-link-icon" style="background:rgba(108,99,255,0.15);">📞</div>
+          <div class="contact-link-text">
+            <strong>Telefon</strong>
+            <span>+998 97 367 77 74</span>
+          </div>
+        </a>
+        <a class="contact-link" href="https://instagram.com/navruz_yusupovich" target="_blank">
+          <div class="contact-link-icon" style="background:rgba(255,101,132,0.15);">📸</div>
+          <div class="contact-link-text">
+            <strong>Instagram</strong>
+            <span>@navruz_yusupovich</span>
+          </div>
+        </a>
+        <div class="contact-link">
+          <div class="contact-link-icon" style="background:rgba(255,101,132,0.15);">📍</div>
+          <div class="contact-link-text">
+            <strong>Joylashuv</strong>
+            <span>Navoiy shahar, O'zbekiston</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="contact-card">
+      <h3>✉️ Xabar Yuboring</h3>
+      <div class="form-group">
+        <label>Ismingiz</label>
+        <input type="text" placeholder="Masalan: Sardor" />
+      </div>
+      <div class="form-group">
+        <label>Telefon raqam</label>
+        <input type="tel" placeholder="+998 __ ___ __ __" />
+      </div>
+      <div class="form-group">
+        <label>Xizmat turi</label>
+        <input type="text" placeholder="Sayt yoki bot?" />
+      </div>
+      <div class="form-group">
+        <label>Xabaringiz</label>
+        <textarea placeholder="Loyihangiz haqida qisqacha yozing..."></textarea>
+      </div>
+      <a class="btn-primary" href="https://t.me/navruz_yusupovich" target="_blank" style="display:block;text-align:center;margin-top:.5rem;">
+        Telegram orqali yuborish →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 <strong>Navruz Rustamov</strong> — Barcha huquqlar himoyalangan</p>
+  <p style="margin-top:.5rem;">Navoiy shahar, O'zbekiston 🇺🇿 &nbsp;|&nbsp; <a href="https://instagram.com/navruz_yusupovich" target="_blank" style="color:var(--accent);text-decoration:none;">📸 @navruz_yusupovich</a></p>
+</footer>
+
+</body>
+</html>
